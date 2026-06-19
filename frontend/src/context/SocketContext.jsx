@@ -8,24 +8,28 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const { user, token } = useAuth();
 
-  useEffect(() => {
-    if (user && token) {
-      const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
-        auth: { token },
-      });
+ useEffect(() => {
+  if (user && token) {
+    const socketUrl = (
+      import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+    ).replace('/api', '');
 
-      newSocket.on('connect', () => {
-        console.log('Socket connected');
-        newSocket.emit('join_user', user._id);
-      });
+    const newSocket = io(socketUrl, {
+      auth: { token },
+    });
 
-      setSocket(newSocket);
+    newSocket.on('connect', () => {
+      console.log('Socket connected');
+      newSocket.emit('join_user', user._id);
+    });
 
-      return () => {
-        newSocket.disconnect();
-      };
-    }
-  }, [user, token]);
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }
+}, [user, token]);
 
   return (
     <SocketContext.Provider value={socket}>
