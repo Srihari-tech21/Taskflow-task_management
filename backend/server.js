@@ -7,8 +7,7 @@ const { Server } = require('socket.io');
 
 dotenv.config();
 
-console.log("ENV CHECK:", process.env.MONGODB_URI);
-
+console.log("Environment loaded");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -19,8 +18,14 @@ const io = new Server(server, {
 });
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+app.use(express.json());app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Make io accessible to routes
